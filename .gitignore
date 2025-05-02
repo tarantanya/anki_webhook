@@ -1,0 +1,7 @@
+.cache/
+.idea/
+.DS_Store
+log/*
+node_modules/
+config/*.local.json
+config/*.current.json
