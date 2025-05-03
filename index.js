@@ -57,7 +57,7 @@ async function sendTelegramMessage(text, chatId) {
 }
 
 async function setWebhook() {
-  const url = `${apiUrl}/setWebhook?url=http://ankiwebhook-production.up.railway.app/telegram-webhook`;
+  const url = `${apiUrl}/setWebhook?url=https://ankiwebhook-production.up.railway.app/telegram-webhook`;
   try {
     const response = await fetch(url, {
       method: "POST",
