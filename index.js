@@ -5,7 +5,7 @@
 
 const express = require('express');
 const bodyParser = require('body-parser');
-const fetch = require('node-fetch');
+// const fetch = require('node-fetch');
 const TelegramBot = require('node-telegram-bot-api');
 const {raw} = require("express");
 const url = "ankiwebhook-production.up.railway.app";
