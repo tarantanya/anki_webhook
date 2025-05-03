@@ -7,9 +7,10 @@ const express = require('express');
 const bodyParser = require('body-parser');
 // const fetch = require('node-fetch');
 const TelegramBot = require('node-telegram-bot-api');
+const url = "ankiwebhook-production.up.railway.app";
 
 const app = express();
-const port = 3000; // Или любой другой порт
+const port = 8443;//3000; // Или любой другой порт
 
 const botToken = '7222342632:AAHn1gKlEN52g4OWTpA98Kj_jbdBFOnEVXA';
 const apiUrl = `https://api.telegram.org/bot${botToken}`;
@@ -55,8 +56,69 @@ async function sendTelegramMessage(text, chatId) {
   // }
 }
 
-app.listen(port, () => {
+async function setWebhook() {
+  const url = `${apiUrl}/setWebhook?url=http://ankiwebhook-production.up.railway.app/telegram-webhook`;
+  try {
+    const response = await fetch(url, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      }
+    });
+    const data = await response.json();
+    if (!data.ok) {
+      console.error("Ошибка отправки:", data);
+    } else {
+      console.log("Webhook установлен успешно");
+      console.log(data);
+    }
+  } catch (error) {
+    console.error("Произошла ошибка при запросе к Telegram API:", error);
+  }
+}
+
+async function webhookInfo() {
+  const url = `${apiUrl}/getWebhookInfo`;
+  try {
+
+    const response = await fetch(url, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json"
+      }
+    });
+    const data = await response.json();
+    console.log("Webhook info");
+    console.log(data);
+  } catch (error) {
+    console.error("Произошла ошибка при запросе к Telegram API:", error);
+  }
+}
+
+async function deleteWebhook() {
+  const url = `${apiUrl}/deleteWebhook`;
+  try {
+    const response = await fetch(url, { method: 'POST' });
+    const data = await response.json();
+
+    if (data.ok) {
+      console.log('Webhook успешно удален:', data);
+      return true;
+    } else {
+      console.error('Ошибка при удалении webhook:', data);
+      return false;
+    }
+  } catch (error) {
+    console.error('Произошла ошибка при запросе к Telegram API:', error);
+    return false;
+  }
+}
+
+app.listen(port, async () => {
   console.log(`Сервер запущен на порту ${port}`);
+  await deleteWebhook();
+  await setWebhook();
+  await webhookInfo();
 });
 
 // const TelegramBot = require('../..');
