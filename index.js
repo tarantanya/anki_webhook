@@ -1,22 +1,12 @@
-
-// const TOKEN = '7222342632:AAHn1gKlEN52g4OWTpA98Kj_jbdBFOnEVXA';//process.env.TELEGRAM_TOKEN || 'YOUR_TELEGRAM_BOT_TOKEN';
-// const url = 'https://<PUBLIC-URL>';
-// const port = process.env.PORT;
-
 const express = require('express');
 const bodyParser = require('body-parser');
-// const fetch = require('node-fetch');
-const TelegramBot = require('node-telegram-bot-api');
-const {raw} = require("express");
-const url = "ankiwebhook-production.up.railway.app";
+import Gemini from "./Gemini";
 
+const urlRailway = "ankiwebhook-production.up.railway.app";
 const app = express();
-const port = 8443;//3000; // Или любой другой порт
-// let bot = null;
-
+const port = 8443;
 const botToken = '7222342632:AAHn1gKlEN52g4OWTpA98Kj_jbdBFOnEVXA';
 const apiUrl = `https://api.telegram.org/bot${botToken}`;
-const chatId = '531229561';
 
 app.use(bodyParser.json());
 
@@ -41,8 +31,10 @@ async function processMessage(message) {
   const username = message.from.username || message.from.first_name || message.from.last_name || 'N/A';
 
   console.log(`Получено сообщение от ${username} (${userId}) в чате ${chatId}: ${text}`);
-  // Здесь ваша логика обработки сообщения
-  await sendTelegramMessage(`Вы сказали: ${text}`, chatId);
+  const gemini = new Gemini();
+  const result = await gemini.checkSentence(text);
+  await sendTelegramMessage(result, chatId);
+  // await sendTelegramMessage(`Вы сказали: ${text}`, chatId);
 }
 
 async function sendTelegramMessage(text, chatId) {
@@ -53,28 +45,13 @@ async function sendTelegramMessage(text, chatId) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ chat_id: chatId, text }),
       });
-    // bot.sendMessage(chatId, text, {parse_mode: "MarkdownV2"});
   } catch (error) {
     console.error("Ошибка отправки сообщения:", error);
   }
-  // const body = {
-  //   chat_id: chatId,
-  //   text: text,
-  //   parse_mode: 'MarkdownV2'
-  // };
-  // const response = await fetch(`${apiUrl}/sendMessage`, {
-  //   method: "POST",
-  //   headers: {"Content-Type": "application/json"},
-  //   body: JSON.stringify(body)
-  // });
-  // const data = await response.json();
-  // if (!data.ok) {
-  //   console.error("Ошибка отправки:", data);
-  // }
 }
 
 async function setWebhook() {
-  const url = `${apiUrl}/setWebhook?url=https://ankiwebhook-production.up.railway.app/telegram-webhook`;
+  const url = `${apiUrl}/setWebhook?url=https://${urlRailway}/telegram-webhook`;
   try {
     const response = await fetch(url, {
       method: "POST",
@@ -136,35 +113,4 @@ app.listen(port, async () => {
   await deleteWebhook();
   await setWebhook();
   await webhookInfo();
-  // bot = new TelegramBot(botToken, {polling: true});
 });
-
-// const TelegramBot = require('../..');
-// const express = require('express');
-
-// No need to pass any parameters as we will handle the updates with Express
-// const bot = new TelegramBot(TOKEN);
-
-// This informs the Telegram servers of the new webhook.
-// bot.setWebHook(`${url}/bot${TOKEN}`);
-
-// const app = express();
-
-// parse the updates to JSON
-// app.use(express.json());
-
-// We are receiving updates at the route below!
-// app.post(`/bot${TOKEN}`, (req, res) => {
-//   bot.processUpdate(req.body);
-//   res.sendStatus(200);
-// });
-
-// Start Express Server
-// app.listen(port, () => {
-//   console.log(`Express server is listening on ${port}`);
-// });
-
-// Just to ping!
-// bot.on('message', msg => {
-//   bot.sendMessage(msg.chat.id, 'I am alive!');
-// });
