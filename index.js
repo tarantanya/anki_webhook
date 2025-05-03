@@ -18,15 +18,20 @@ const chatId = '531229561';
 
 app.use(bodyParser.json());
 
-app.post('/telegram-webhook', (req, res) => {
-  const update = req.body;
-  if (update.message && update.message.text) {
-    processMessage(update.message);
+app.post('/telegram-webhook', async (req, res) => {
+  try {
+    const update = req.body;
+    if (update.message && update.message.text) {
+      await processMessage(update.message);
+    }
+    await res.sendStatus(200); // Отправьте 200 OK, чтобы Telegram знал, что запрос получен
+  } catch (error) {
+    console.error("Ошибка обработки сообщения:", error);
+    // res.sendStatus(500); // Отправьте 500 Internal Server Error в случае ошибки
   }
-  res.sendStatus(200); // Отправьте 200 OK, чтобы Telegram знал, что запрос получен
 });
 
-function processMessage(message) {
+async function processMessage(message) {
   const chatId = message.chat.id;
   const text = message.text;
   const userId = message.from.id;
@@ -34,12 +39,16 @@ function processMessage(message) {
 
   console.log(`Получено сообщение от ${username} (${userId}) в чате ${chatId}: ${text}`);
   // Здесь ваша логика обработки сообщения
-  sendTelegramMessage(`Вы сказали: ${text}`, chatId);
+  await sendTelegramMessage(`Вы сказали: ${text}`, chatId);
 }
 
 async function sendTelegramMessage(text, chatId) {
-  const bot = new TelegramBot(botToken, {polling: true});
-  await bot.sendMessage(chatId, text, {parse_mode: "MarkdownV2" });
+  try {
+    const bot = new TelegramBot(botToken, {polling: true});
+    await bot.sendMessage(chatId, text, {parse_mode: "MarkdownV2"});
+  } catch (error) {
+    console.error("Ошибка отправки сообщения:", error);
+  }
   // const body = {
   //   chat_id: chatId,
   //   text: text,
