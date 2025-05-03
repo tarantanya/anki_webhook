@@ -11,6 +11,7 @@ const url = "ankiwebhook-production.up.railway.app";
 
 const app = express();
 const port = 8443;//3000; // Или любой другой порт
+let bot = null;
 
 const botToken = '7222342632:AAHn1gKlEN52g4OWTpA98Kj_jbdBFOnEVXA';
 const apiUrl = `https://api.telegram.org/bot${botToken}`;
@@ -18,20 +19,21 @@ const chatId = '531229561';
 
 app.use(bodyParser.json());
 
-app.post('/telegram-webhook', async (req, res) => {
+app.post('/telegram-webhook', (req, res) => {
   try {
     const update = req.body;
+    console.log("Получено обновление:", update);
     if (update.message && update.message.text) {
-      await processMessage(update.message);
+      processMessage(update.message);
     }
-    await res.sendStatus(200); // Отправьте 200 OK, чтобы Telegram знал, что запрос получен
+    res.sendStatus(200); // Отправьте 200 OK, чтобы Telegram знал, что запрос получен
   } catch (error) {
     console.error("Ошибка обработки сообщения:", error);
     // res.sendStatus(500); // Отправьте 500 Internal Server Error в случае ошибки
   }
 });
 
-async function processMessage(message) {
+function processMessage(message) {
   const chatId = message.chat.id;
   const text = message.text;
   const userId = message.from.id;
@@ -39,13 +41,12 @@ async function processMessage(message) {
 
   console.log(`Получено сообщение от ${username} (${userId}) в чате ${chatId}: ${text}`);
   // Здесь ваша логика обработки сообщения
-  await sendTelegramMessage(`Вы сказали: ${text}`, chatId);
+  sendTelegramMessage(`Вы сказали: ${text}`, chatId);
 }
 
-async function sendTelegramMessage(text, chatId) {
+function sendTelegramMessage(text, chatId) {
   try {
-    const bot = new TelegramBot(botToken, {polling: true});
-    await bot.sendMessage(chatId, text, {parse_mode: "MarkdownV2"});
+    bot.sendMessage(chatId, text, {parse_mode: "MarkdownV2"});
   } catch (error) {
     console.error("Ошибка отправки сообщения:", error);
   }
@@ -128,6 +129,7 @@ app.listen(port, async () => {
   await deleteWebhook();
   await setWebhook();
   await webhookInfo();
+  bot = new TelegramBot(botToken, {polling: true});
 });
 
 // const TelegramBot = require('../..');
