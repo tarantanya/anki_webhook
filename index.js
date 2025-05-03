@@ -1,6 +1,8 @@
 const express = require('express');
 const bodyParser = require('body-parser');
-import Gemini from "./Gemini";
+// const Gemini = require("./Gemini");
+const GoogleGenAI = require("@google/genai");
+// import { GoogleGenAI } from "@google/genai";
 
 const urlRailway = "ankiwebhook-production.up.railway.app";
 const app = express();
@@ -105,6 +107,27 @@ async function deleteWebhook() {
   } catch (error) {
     console.error('Произошла ошибка при запросе к Telegram API:', error);
     return false;
+  }
+}
+
+async function checkSentence(sentence) {
+  try {
+    const ai = new GoogleGenAI({ apiKey: "AIzaSyCdi3gJ3BK_KKaS2di1NW35CJflUySdTB4" });
+    const res =  await ai.models.generateContent({
+      model: "gemini-2.0-flash",
+      contents: `Ты учитель английского, я студент с уровнем A2. У меня есть 3 слова и мне нужно сделать с ними простое предложение. Я пишу предложения на английском, а ты исправляй если я сделала ошибку: ${sentence}`,
+    });
+    console.log(res);
+    if (res.text) {
+      return res.text;
+    }
+    else {
+      console.log("Ошибка в ответе Gemini:", res);
+      return `Ошибка в ответе Gemini: ${res}`;
+    }
+  } catch (error) {
+    console.error("Ошибка gemini:", error);
+    return `Ошибка Gemini: ${error}`;
   }
 }
 
