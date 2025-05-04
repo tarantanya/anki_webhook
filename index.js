@@ -1,9 +1,5 @@
 const express = require('express');
 const bodyParser = require('body-parser');
-// const Gemini = require("./Gemini");
-// const GoogleGenAI = require("@google/genai");
-// import { GoogleGenAI } from "@google/genai";
-
 
 const urlRailway = "ankiwebhook-production.up.railway.app";
 const app = express();
@@ -23,7 +19,7 @@ app.post('/telegram-webhook', async (req, res) => {
     res.sendStatus(200); // Отправьте 200 OK, чтобы Telegram знал, что запрос получен
   } catch (error) {
     console.error("Ошибка обработки сообщения:", error);
-    // res.sendStatus(500); // Отправьте 500 Internal Server Error в случае ошибки
+    res.sendStatus(500); // Отправьте 500 Internal Server Error в случае ошибки
   }
 });
 
@@ -36,7 +32,6 @@ async function processMessage(message) {
   console.log(`Получено сообщение от ${username} (${userId}) в чате ${chatId}: ${text}`);
   const result = await checkSentence(text);
   await sendTelegramMessage(result, chatId);
-  // await sendTelegramMessage(`Вы сказали: ${text}`, chatId);
 }
 
 async function sendTelegramMessage(text, chatId) {
@@ -118,7 +113,6 @@ async function checkSentence(sentence) {
       model: "gemini-2.0-flash",
       contents: `Ты учитель английского, я студент с уровнем A2. У меня есть 3 слова и мне нужно сделать с ними простое предложение. Я пишу предложения на английском, а ты исправляй если я сделала ошибку: ${sentence}`,
     });
-    console.log(res);
     if (res.text) {
       return res.text;
     }
