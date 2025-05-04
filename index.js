@@ -19,7 +19,6 @@ app.post('/telegram-webhook', async (req, res) => {
     res.sendStatus(200); // Отправьте 200 OK, чтобы Telegram знал, что запрос получен
   } catch (error) {
     console.error("Ошибка обработки сообщения:", error);
-    res.sendStatus(500); // Отправьте 500 Internal Server Error в случае ошибки
   }
 });
 
