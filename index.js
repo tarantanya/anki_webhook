@@ -1,8 +1,9 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 // const Gemini = require("./Gemini");
-const GoogleGenAI = require("@google/genai");
-// import { GoogleGenAI } from "@google/genai";
+// const GoogleGenAI = require("@google/genai");
+import { GoogleGenAI } from "@google/genai";
+
 
 const urlRailway = "ankiwebhook-production.up.railway.app";
 const app = express();
@@ -33,8 +34,7 @@ async function processMessage(message) {
   const username = message.from.username || message.from.first_name || message.from.last_name || 'N/A';
 
   console.log(`Получено сообщение от ${username} (${userId}) в чате ${chatId}: ${text}`);
-  const gemini = new Gemini();
-  const result = await gemini.checkSentence(text);
+  const result = await checkSentence(text);
   await sendTelegramMessage(result, chatId);
   // await sendTelegramMessage(`Вы сказали: ${text}`, chatId);
 }
