@@ -12,7 +12,6 @@ app.use(bodyParser.json());
 app.post('/telegram-webhook', async (req, res) => {
   try {
     const update = req.body;
-    console.log("Получено обновление:", update);
     if (update.message && update.message.text) {
       await processMessage(update.message);
     }
@@ -125,9 +124,18 @@ async function checkSentence(sentence) {
   }
 }
 
-app.listen(port, async () => {
-  console.log(`Сервер запущен на порту ${port}`);
+async function init(){
   await deleteWebhook();
   await setWebhook();
   await webhookInfo();
+}
+
+app.listen(port, async () => {
+  console.log(`Сервер запущен на порту ${port}`);
+  try {
+    await init();
+  }
+  catch (e) {
+    console.error("Ошибка инициализации:", e);
+  }
 });
