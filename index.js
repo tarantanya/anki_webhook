@@ -2,7 +2,7 @@ const express = require('express');
 const bodyParser = require('body-parser');
 // const Gemini = require("./Gemini");
 // const GoogleGenAI = require("@google/genai");
-import { GoogleGenAI } from "@google/genai";
+// import { GoogleGenAI } from "@google/genai";
 
 
 const urlRailway = "ankiwebhook-production.up.railway.app";
@@ -112,6 +112,7 @@ async function deleteWebhook() {
 
 async function checkSentence(sentence) {
   try {
+    const { GoogleGenAI } = await import("@google/genai");
     const ai = new GoogleGenAI({ apiKey: "AIzaSyCdi3gJ3BK_KKaS2di1NW35CJflUySdTB4" });
     const res =  await ai.models.generateContent({
       model: "gemini-2.0-flash",
